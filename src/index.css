@@ -1,13 +1,71 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: 'Montserrat', sans-serif;
+  }
+}
+
+/* ================================
+   CLEAN SCROLLBAR STYLES
+   ================================ */
+
+/* Modern Clean Scrollbar */
+* {
+  /* Firefox */
+  scrollbar-width: thin;
+  scrollbar-color: #a0e870 transparent;
+}
+
+/* Webkit (Chrome, Safari, newer Edge) */
+*::-webkit-scrollbar {
+  width: 2px;
+  background: transparent;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+  margin: 2px 0;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: #a0e870;
+  border-radius: 4px;
+  min-height: 40px;
+}
+
+/* Hide all scrollbar buttons and corners */
+*::-webkit-scrollbar-button,
+*::-webkit-scrollbar-corner,
+*::-webkit-resizer {
+  display: none;
+}
+
+/* ================================
+   GLOBAL STYLES
+   ================================ */
+
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: 'Montserrat', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+/* ================================
+   APP LAYOUT STYLES
+   ================================ */
+
+.App {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f6f7fc 0%, #c4fac2 100%);
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
 }
