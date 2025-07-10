@@ -2,17 +2,63 @@ import "./index.css";
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
+// Add CountUp animation hook
+function useCountUp(end, duration = 0.2) {
+  const [count, setCount] = useState(0);
+  const previousEnd = useRef(end);
+
+  useEffect(() => {
+    let startTime;
+    let animationFrame;
+    const startValue = previousEnd.current;
+
+    const animation = (currentTime) => {
+      if (!startTime) startTime = currentTime;
+      const progress = Math.min(
+        (currentTime - startTime) / (duration * 1000),
+        1
+      );
+
+      const currentCount = progress * (end - startValue) + startValue;
+      setCount(currentCount);
+
+      if (progress < 1) {
+        animationFrame = requestAnimationFrame(animation);
+      }
+    };
+
+    animationFrame = requestAnimationFrame(animation);
+    previousEnd.current = end;
+
+    return () => {
+      if (animationFrame) {
+        cancelAnimationFrame(animationFrame);
+      }
+    };
+  }, [end, duration]);
+
+  return count;
+}
+
+// Add AnimatedNumber component
+function AnimatedNumber({ value }) {
+  const animatedValue = useCountUp(parseFloat(value) || 0);
+  return animatedValue.toFixed(2);
+}
+
 export default function App() {
   const [amount, setAmount] = useState("1");
   const [fromCurrency, setFromCurrency] = useState({
     value: "USD",
     label: "USD",
     flag: "🇺🇸",
+    symbol: "$"
   });
   const [toCurrency, setToCurrency] = useState({
     value: "EUR",
     label: "EUR",
     flag: "🇪🇺",
+    symbol: "€"
   });
   const [convertedAmount, setConvertedAmount] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -25,16 +71,19 @@ export default function App() {
   };
 
   const currencyOptions = [
-    { value: "USD", label: "USD", flag: "🇺🇸" },
-    { value: "EUR", label: "EUR", flag: "🇪🇺" },
-    { value: "GBP", label: "GBP", flag: "🇬🇧" },
-    { value: "JPY", label: "JPY", flag: "🇯🇵" },
-    { value: "CAD", label: "CAD", flag: "🇨🇦" },
-    { value: "AUD", label: "AUD", flag: "🇦🇺" },
+    { value: "USD", label: "USD", flag: "🇺🇸", symbol: "$" },
+    { value: "EUR", label: "EUR", flag: "🇪🇺", symbol: "€" },
+    { value: "GBP", label: "GBP", flag: "🇬🇧", symbol: "£" },
+    { value: "JPY", label: "JPY", flag: "🇯🇵", symbol: "¥" },
+    { value: "CAD", label: "CAD", flag: "🇨🇦", symbol: "$" },
+    { value: "AUD", label: "AUD", flag: "🇦🇺", symbol: "$" },
   ];
 
   const convertCurrency = async () => {
-    if (!amount) return;
+    if (!amount) {
+      setConvertedAmount("0.00");
+      return;
+    }
 
     setIsLoading(true);
     try {
@@ -73,29 +122,42 @@ export default function App() {
         <div className="p-2 rounded-3xl flex flex-col gap-3 border-2 border-gray-200 shadow-[0_20px_40px_rgba(0,0,0,0.1)]">
           <Card>
             <p className="text-gray-500 text-sm">Amount</p>
-            <div className="flex items-center gap-2">
-              <Input value={amount} onChange={setAmount} />
+            <div className="flex items-end gap-2">
+              <div className="flex items-center gap-1 min-w-4 pb-1">
+                <span className="text-gray-500">{fromCurrency.symbol}</span>
+              </div>
+              <div className="flex-1">
+                <Input
+                  value={amount}
+                  onChange={setAmount}
+                  setAmount={setAmount}
+                />
+              </div>
               <CustomSelect
                 options={getAvailableOptions(toCurrency)}
                 value={fromCurrency}
                 onChange={setFromCurrency}
+                position="top"
               />
             </div>
           </Card>
           <Card>
             <p className="text-gray-500 text-sm">Converted to</p>
-            <div className="flex items-center justify-between gap-2 w-full">
-              <div
-                value={convertedAmount}
+            <div className="flex items-end gap-2">
+              <div className="flex items-center gap-1 min-w-4 pb-1">
+                <span className="text-gray-500">{toCurrency.symbol}</span>
+              </div>
+              <div 
                 onClick={handelValueCopy}
-                className="flex bg-transparent text-2xl font-medium cursor-pointer w-[50%] "
+                className="flex-1 bg-transparent outline-none text-2xl font-medium cursor-pointer m-0 p-0"
               >
-                {convertedAmount ? convertedAmount : "0.00"}
+                <AnimatedNumber value={convertedAmount || "0.00"} />
               </div>
               <CustomSelect
                 options={getAvailableOptions(fromCurrency)}
                 value={toCurrency}
                 onChange={setToCurrency}
+                position="bottom"
               />
             </div>
           </Card>
@@ -110,12 +172,32 @@ export default function App() {
   );
 }
 
-function Input({ value, onChange, readonly = false }) {
+function Input({ value, onChange, readonly = false, setAmount }) {
+  const inputRef = useRef(null);
+
+  useEffect(() => {
+    function callback(e) {
+      if (document.activeElement === inputRef.current) {
+        return;
+      }
+      if (e.code === "Enter") {
+        inputRef.current.focus();
+        setAmount("");
+      }
+    }
+
+    inputRef.current.focus();
+
+    document.addEventListener("keydown", callback);
+    return () => document.removeEventListener("keydown", callback);
+  }, [setAmount]);
+
   return (
     <div className="rounded-md select-none">
       <input
         type="text"
         value={value}
+        ref={inputRef}
         onChange={(e) => {
           // Only allow numbers and decimal point
           const val = e.target.value.replace(/[^0-9.]/g, "");
@@ -131,7 +213,7 @@ function Input({ value, onChange, readonly = false }) {
   );
 }
 
-function CustomSelect({ options, value, onChange }) {
+function CustomSelect({ options, value, onChange, position = "top" }) {
   const [isOpen, setIsOpen] = useState(false);
   const [selected, setSelected] = useState(value);
   const selectRef = useRef(null);
@@ -166,15 +248,19 @@ function CustomSelect({ options, value, onChange }) {
         className="flex items-center justify-center px-4 py-2 min-w-32 bg-white border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#a0e870] focus:border-transparent"
         onClick={() => setIsOpen(!isOpen)}
       >
-        <div className="flex items-center gap-2">
-          <span className="text-base">{selected.flag}</span>
-          <span className="text-base font-medium">{selected.label}</span>
-        </div>
-        <motion.span
-          className="ml-2 text-gray-500"
-          animate={{ rotate: isOpen ? 180 : 0 }}
-          transition={{ duration: 0.2 }}
-        ></motion.span>
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={selected.value}
+            className="flex items-center gap-2"
+            initial={{ y: position === "top" ? -10 : 10, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: position === "top" ? 10 : -10, opacity: 0 }}
+            transition={{ duration: 0.2, ease: "easeInOut" }}
+          >
+            <span className="text-base">{selected.symbol}</span>
+            <span className="text-base font-medium">{selected.label}</span>
+          </motion.div>
+        </AnimatePresence>
       </button>
 
       {/* Animated Dropdown */}
@@ -185,10 +271,10 @@ function CustomSelect({ options, value, onChange }) {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.2, ease: "easeOut" }}
-            className="absolute min-w-32 left-0 right-0 mt-2 bg-white border border-[#a0e870] rounded-2xl shadow-lg z-50 overflow-hidden pt-1"
+            className="absolute min-w-32 left-0 right-0 mt-2 bg-white border border-[#a0e870] rounded-2xl shadow-lg z-50 overflow-hidden pt-1 pb-1"
           >
             <div className="max-h-48 overflow-y-auto overflow-x-hidden">
-              {options.map((option, index) => (
+              {options.map((option) => (
                 <motion.div
                   key={option.value}
                   initial={{ opacity: 0 }}
@@ -201,7 +287,7 @@ function CustomSelect({ options, value, onChange }) {
                   }`}
                   onClick={() => handleOptionClick(option)}
                 >
-                  <span className="text-base">{option.flag}</span>
+                  <span className="text-base">{option.symbol}</span>
                   <span className="text-base font-medium">{option.label}</span>
                 </motion.div>
               ))}
@@ -222,9 +308,26 @@ function Card({ children }) {
 }
 
 function SwapButton({ onClick, isLoading, isCopied }) {
+  const swapRef = useRef(null);
+
+  useEffect(() => {
+    function callback(e) {
+      if (document.activeElement === swapRef.current) {
+        return;
+      }
+      if (e.code === "Space") {
+        onClick();
+      }
+    }
+
+    document.addEventListener("keydown", callback);
+    return () => document.removeEventListener("keydown", callback);
+  }, [onClick]);
+
   return (
     <div className="rounded-md select-none">
       <button
+        ref={swapRef}
         onClick={onClick}
         className="w-full min-h-18 outline-none text-2xl bg-[#a0e870] py-4 rounded-2xl hover:bg-[#7fcf4c] transition-colors duration-200 overflow-hidden"
       >
