@@ -27,6 +27,8 @@ CCurrency is a production-ready currency converter application that provides rea
 
 **🌐 Live Application:** [ccurrency-nine.vercel.app](https://ccurrency-nine.vercel.app/)
 
+<img width="1276" height="640" alt="image" src="https://github.com/user-attachments/assets/63a0b94f-10b1-4d4a-9b6d-c7e82d5c08d5" />
+
 ---
 
 ## ✨ Features
@@ -303,7 +305,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **Aiman Almadani**
 - GitHub: [@Aiman-Almadani](https://github.com/Aiman-Almadani)
-- LinkedIn: [Connect with me](https://linkedin.com/in/aiman-almadani)
 
 ---
 
