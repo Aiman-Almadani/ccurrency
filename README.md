@@ -303,7 +303,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **Aiman Almadani**
 - GitHub: [@Aiman-Almadani](https://github.com/Aiman-Almadani)
-- LinkedIn: [Connect with me](https://linkedin.com/in/aiman-almadani)
 
 ---
 
