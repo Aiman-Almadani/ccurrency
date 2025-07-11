@@ -27,6 +27,8 @@ CCurrency is a production-ready currency converter application that provides rea
 
 **🌐 Live Application:** [ccurrency-nine.vercel.app](https://ccurrency-nine.vercel.app/)
 
+<img width="611" height="621" alt="image" src="https://github.com/user-attachments/assets/b6fed135-a08a-429a-9f80-4eb9bfbc2de5" />
+
 ---
 
 ## ✨ Features
