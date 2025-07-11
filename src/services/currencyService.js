@@ -152,6 +152,8 @@ class CurrencyService {
     throw new Error('Invalid response format or empty rates');
   }
 
+
+
   getSupportedCurrencies() {
     return [
       { value: "USD", label: "USD", flag: "🇺🇸", symbol: "$", name: "US Dollar" },
