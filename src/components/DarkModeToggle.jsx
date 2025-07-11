@@ -8,7 +8,7 @@ const DarkModeToggle = ({ className = "" }) => {
   return (
     <button
       onClick={toggleDarkMode}
-      className={`relative w-14 h-8 rounded-full p-1 transition-colors duration-200 focus:outline-none ${
+      className={`relative w-12 h-7 rounded-full p-0.5 transition-colors duration-200 focus:outline-none ${
         isDarkMode ? 'bg-[#a0e870]' : 'bg-gray-300'
       } ${className}`}
       aria-label={`Switch to ${isDarkMode ? 'light' : 'dark'} mode`}
@@ -18,7 +18,7 @@ const DarkModeToggle = ({ className = "" }) => {
         className={`w-6 h-6 rounded-full shadow-md flex items-center justify-center ${
           isDarkMode ? 'bg-gray-800' : 'bg-white'
         }`}
-        animate={{ x: isDarkMode ? 20 : 0 }}
+        animate={{ x: isDarkMode ? 18 : 0 }}
         transition={{ type: 'spring', stiffness: 300, damping: 30 }}
       >
         <motion.div
