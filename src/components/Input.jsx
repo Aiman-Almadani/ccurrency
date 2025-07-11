@@ -23,14 +23,15 @@ const Input = ({
   useEffect(() => {
     if (autoFocus && inputRef.current) {
       inputRef.current.focus();
+      inputRef.current.select();
     }
 
     const handleKeyDown = (e) => {
-      // Focus input when Enter is pressed (but not if already focused)
+      // Only handle Enter key when input is not focused
       if (e.key === 'Enter' && document.activeElement !== inputRef.current) {
         e.preventDefault();
         inputRef.current?.focus();
-        inputRef.current?.select(); // Select all text for easy replacement
+        inputRef.current?.select();
       }
     };
 
@@ -48,6 +49,12 @@ const Input = ({
         readOnly={readonly}
         placeholder={placeholder}
         aria-label={ariaLabel}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            e.target.select();
+          }
+        }}
         className={`w-full bg-transparent border-none outline-none focus:outline-none focus:ring-0 focus:border-none text-2xl font-medium text-black dark:text-white placeholder-gray-400 dark:placeholder-gray-500 ${className}`}
         style={{ boxShadow: 'none' }}
       />

@@ -1,3 +1,9 @@
 # https://www.robotstxt.org/robotstxt.html
 User-agent: *
-Disallow:
+Allow: /
+
+# Sitemap
+Sitemap: https://ccurrency-nine.vercel.app/sitemap.xml
+
+# Crawl-delay
+Crawl-delay: 1

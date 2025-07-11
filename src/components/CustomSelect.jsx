@@ -12,6 +12,7 @@ const CustomSelect = ({
   const [isOpen, setIsOpen] = useState(false);
   const [selected, setSelected] = useState(value);
   const selectRef = useRef(null);
+  const buttonRef = useRef(null);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -28,7 +29,8 @@ const CustomSelect = ({
   // Handle keyboard navigation
   useEffect(() => {
     const handleKeyDown = (event) => {
-      if (!isOpen) return;
+      // Only handle keyboard events when select or its options are focused
+      if (!selectRef.current?.contains(document.activeElement)) return;
 
       if (event.key === "Escape") {
         setIsOpen(false);
@@ -46,7 +48,8 @@ const CustomSelect = ({
   };
 
   const handleKeyPress = (event, option) => {
-    if (event.key === "Enter" || event.key === " ") {
+    // Only handle Enter/Space when the option itself is focused
+    if (document.activeElement === event.target && (event.key === "Enter" || event.key === " ")) {
       event.preventDefault();
       handleOptionClick(option);
     }
@@ -61,8 +64,16 @@ const CustomSelect = ({
     <div className={`relative min-w-20 ${className}`} ref={selectRef}>
       {/* Select Button */}
       <button
+        ref={buttonRef}
         className="flex items-center justify-center px-4 py-2 min-w-32 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-2xl focus:outline-none transition-colors duration-200"
         onClick={() => setIsOpen(!isOpen)}
+        onKeyDown={(e) => {
+          // Only handle Enter/Space when button is focused
+          if (document.activeElement === buttonRef.current && (e.key === "Enter" || e.key === " ")) {
+            e.preventDefault();
+            setIsOpen(!isOpen);
+          }
+        }}
         aria-label={ariaLabel}
         aria-expanded={isOpen}
         aria-haspopup="listbox"
